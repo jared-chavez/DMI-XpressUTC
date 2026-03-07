@@ -1,6 +1,7 @@
 package com.example.xpressutc
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -30,7 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.xpressutc.ui.theme.XpressUTCTheme
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -58,13 +60,12 @@ fun MainApp() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance()
 
-    // Envolvemos con RTL para que el drawer abra desde la derecha (donde está la hamburguesa)
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                // Devolvemos a LTR el contenido del menú para que el texto no se vea al revés
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     ModalDrawerSheet(
                         drawerContainerColor = Color.Black,
@@ -119,13 +120,14 @@ fun MainApp() {
                 }
             }
         ) {
-            // Devolvemos a LTR el contenido principal de la app
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") { HomeScreen(drawerState, scope, navController) }
-                    composable("login") { LoginScreen(navController) }
-                    composable("register") { RegisterScreen(navController) }
+                    composable("login") { LoginScreen(navController, auth) }
+                    composable("register") { RegisterScreen(navController, auth) }
                     composable("catalog") { CatalogScreen(drawerState, scope) }
+                    composable("student") { StudentScreen(navController) }
+                    composable("admin") { AdminScreen(navController) }
                 }
             }
         }
@@ -164,9 +166,10 @@ fun HomeScreen(drawerState: DrawerState, scope: kotlinx.coroutines.CoroutineScop
 }
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController, auth: FirebaseAuth) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize().background(Color.Black).padding(24.dp),
@@ -185,7 +188,9 @@ fun LoginScreen(navController: NavHostController) {
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = Color.White,
                 focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+                unfocusedTextColor = Color.White,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = Color.White
             )
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -200,7 +205,9 @@ fun LoginScreen(navController: NavHostController) {
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = Color.White,
                 focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+                unfocusedTextColor = Color.White,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = Color.White
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -209,7 +216,23 @@ fun LoginScreen(navController: NavHostController) {
         }
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { /* Lógica de login */ },
+            onClick = { 
+                val cleanEmail = email.trim() // Quitamos espacios extras
+                val cleanPass = password.trim()
+                
+                if (cleanEmail == "cafeadmin@utc.edu.mx" && cleanPass == "admincafe") {
+                    navController.navigate("admin")
+                } else if (cleanEmail.isNotEmpty() && cleanPass.isNotEmpty()) {
+                    auth.signInWithEmailAndPassword(cleanEmail, cleanPass)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                navController.navigate("student")
+                            } else {
+                                Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -230,11 +253,12 @@ fun LoginScreen(navController: NavHostController) {
 }
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
+fun RegisterScreen(navController: NavHostController, auth: FirebaseAuth) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize().background(Color.Black).padding(24.dp),
@@ -263,7 +287,21 @@ fun RegisterScreen(navController: NavHostController) {
         
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = { /* Lógica de registro */ },
+            onClick = { 
+                val cleanEmail = email.trim() // Quitamos espacios extras
+                
+                if (cleanEmail.isNotEmpty() && password.isNotEmpty()) {
+                    auth.createUserWithEmailAndPassword(cleanEmail, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(context, "¡Cuenta creada!", Toast.LENGTH_SHORT).show()
+                                navController.navigate("login")
+                            } else {
+                                Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(50.dp),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -323,7 +361,7 @@ fun CatalogItemCard(name: String) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column {
-            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(Color.LightGray)) // Placeholder Imagen
+            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(Color.LightGray))
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Text("$55.00", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
