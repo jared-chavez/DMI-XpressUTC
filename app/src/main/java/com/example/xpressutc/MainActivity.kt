@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.xpressutc.ui.theme.XpressUTCTheme
+import com.example.xpressutc.ui.SnackScreen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -99,6 +100,15 @@ fun MainApp() {
                             colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
                         )
                         NavigationDrawerItem(
+                            label = { Text("Info Snacks", color = Color.White) },
+                            selected = false,
+                            onClick = { 
+                                navController.navigate("snacks")
+                                scope.launch { drawerState.close() } 
+                            },
+                            colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
+                        )
+                        NavigationDrawerItem(
                             label = { Text("Registro", color = Color.White) },
                             selected = false,
                             onClick = { 
@@ -128,6 +138,7 @@ fun MainApp() {
                     composable("catalog") { CatalogScreen(drawerState, scope) }
                     composable("student") { StudentScreen(navController) }
                     composable("admin") { AdminScreen(navController) }
+                    composable("snacks") { SnackScreen() }
                 }
             }
         }
@@ -217,7 +228,7 @@ fun LoginScreen(navController: NavHostController, auth: FirebaseAuth) {
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = { 
-                val cleanEmail = email.trim() // Quitamos espacios extras
+                val cleanEmail = email.trim()
                 val cleanPass = password.trim()
                 
                 if (cleanEmail == "cafeadmin@utc.edu.mx" && cleanPass == "admincafe") {
@@ -288,7 +299,7 @@ fun RegisterScreen(navController: NavHostController, auth: FirebaseAuth) {
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = { 
-                val cleanEmail = email.trim() // Quitamos espacios extras
+                val cleanEmail = email.trim()
                 
                 if (cleanEmail.isNotEmpty() && password.isNotEmpty()) {
                     auth.createUserWithEmailAndPassword(cleanEmail, password)

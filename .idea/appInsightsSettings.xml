@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.xpressutc" />
+                  <option name="mobileSdkAppId" value="1:436330185196:android:e57f8cd183d7ac7eb540c9" />
+                  <option name="projectId" value="xpressutc" />
+                  <option name="projectNumber" value="436330185196" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

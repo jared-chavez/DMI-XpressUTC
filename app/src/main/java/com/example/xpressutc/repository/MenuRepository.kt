@@ -18,7 +18,7 @@ class MenuRepository {
         }
     }
 
-    // ¡La función debe ir AQUÍ adentro, antes de que cierre la clase!
+
     suspend fun guardarPedido(correoAlumno: String, total: Double, platillos: List<String>): Boolean {
         return try {
             val nuevoPedido = hashMapOf(
