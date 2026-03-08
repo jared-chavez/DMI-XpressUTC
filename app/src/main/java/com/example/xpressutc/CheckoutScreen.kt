@@ -40,12 +40,12 @@ class CheckoutViewModel : ViewModel() {
 
     fun processPayment(total: Double) {
         uiState = PaymentUiState.Processing
-
+        
         viewModelScope.launch {
             try {
                 // SIMULACIÓN DE PETICIÓN ASÍNCRONA A STRIPE
                 // Aquí se usaría la STRIPE_PUBLISHABLE_KEY para tokenizar la tarjeta
-                delay(2500)
+                delay(2500) 
 
                 if (total > 0) {
                     uiState = PaymentUiState.Success("STRIPE-CHG-${System.currentTimeMillis()}")

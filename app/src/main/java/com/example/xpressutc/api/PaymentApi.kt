@@ -27,7 +27,7 @@ interface PaymentApiService {
 
 object PaymentRetrofitClient {
     // Usaremos un Mock API o una URL base para la demostración
-    private const val BASE_URL = "https://run.mocky.io/"
+    private const val BASE_URL = "https://run.mocky.io/" 
 
     val instance: PaymentApiService by lazy {
         Retrofit.Builder()
