@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "436330185196",
+    "project_id": "xpressutc",
+    "storage_bucket": "xpressutc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436330185196:android:e57f8cd183d7ac7eb540c9",
+        "android_client_info": {
+          "package_name": "com.example.xpressutc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaL0GBe-5GvOK2zJPyekC3RjtYFCiQXDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
