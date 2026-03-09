@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Login
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -426,6 +429,7 @@ fun BottomNavItem(icon: ImageVector, label: String, isSelected: Boolean, onClick
 fun LoginScreen(navController: NavHostController, auth: FirebaseAuth) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(
@@ -433,52 +437,73 @@ fun LoginScreen(navController: NavHostController, auth: FirebaseAuth) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Iniciar Sesión", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, color = Color.White)
+        Icon(Icons.Default.Restaurant, contentDescription = null, tint = UniversityGreen, modifier = Modifier.size(80.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("¡Bienvenido!", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Inicia sesión para continuar", color = Color.Gray, fontSize = 14.sp)
         Spacer(modifier = Modifier.height(32.dp))
+        
+        val textFieldColors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = UniversityGreen,
+            unfocusedBorderColor = Color.DarkGray,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            focusedLabelColor = UniversityGreen,
+            unfocusedLabelColor = Color.Gray,
+            focusedContainerColor = CardBlack.copy(alpha = 0.5f),
+            unfocusedContainerColor = CardBlack.copy(alpha = 0.5f)
+        )
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo Universitario", color = Color.White) },
+            label = { Text("Correo Universitario") },
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = UniversityGreen) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = UniversityGreen,
-                unfocusedBorderColor = Color.White,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedLabelColor = UniversityGreen,
-                unfocusedLabelColor = Color.White
-            )
+            colors = textFieldColors
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña", color = Color.White) },
+            label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
+            shape = RoundedCornerShape(16.dp),
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = UniversityGreen) },
+            trailingIcon = {
+                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                    Icon(
+                        if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = null,
+                        tint = Color.Gray
+                    )
+                }
+            },
+            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = UniversityGreen,
-                unfocusedBorderColor = Color.White,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedLabelColor = UniversityGreen,
-                unfocusedLabelColor = Color.White
-            )
+            colors = textFieldColors
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = { 
                 val cleanEmail = email.trim()
                 val cleanPass = password.trim()
                 
+                if (cleanEmail.isEmpty() || cleanPass.isEmpty()) {
+                    Toast.makeText(context, "Por favor, llena todos los campos", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
                 if (cleanEmail == "cafeadmin@utc.edu.mx" && cleanPass == "admincafe") {
+                    Toast.makeText(context, "¡Bienvenido Administrador!", Toast.LENGTH_SHORT).show()
                     navController.navigate("admin")
-                } else if (cleanEmail.isNotEmpty() && cleanPass.isNotEmpty()) {
+                } else {
                     auth.signInWithEmailAndPassword(cleanEmail, cleanPass)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+                                Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
                                 navController.navigate("student")
                             } else {
                                 Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
@@ -486,11 +511,11 @@ fun LoginScreen(navController: NavHostController, auth: FirebaseAuth) {
                         }
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = UniversityGreen)
         ) {
-            Text("Ingresar", color = Color.White)
+            Text("Ingresar", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(16.dp))
         TextButton(onClick = { navController.navigate("register") }) {
@@ -514,52 +539,98 @@ fun RegisterScreen(navController: NavHostController, auth: FirebaseAuth) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black).padding(24.dp),
+        modifier = Modifier.fillMaxSize().background(Color.Black).padding(24.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Crear Cuenta", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, color = Color.White)
-        Spacer(modifier = Modifier.height(24.dp))
+        Text("Únete a la comunidad XpressUTC", color = Color.Gray, fontSize = 14.sp)
+        Spacer(modifier = Modifier.height(32.dp))
         
         val textFieldColors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = UniversityGreen,
-            unfocusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.DarkGray,
             focusedTextColor = Color.White,
             unfocusedTextColor = Color.White,
             focusedLabelColor = UniversityGreen,
-            unfocusedLabelColor = Color.White
+            unfocusedLabelColor = Color.Gray,
+            focusedContainerColor = CardBlack.copy(alpha = 0.5f),
+            unfocusedContainerColor = CardBlack.copy(alpha = 0.5f)
         )
 
-        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre Completo") }, modifier = Modifier.fillMaxWidth(), colors = textFieldColors)
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Correo Institucional") }, modifier = Modifier.fillMaxWidth(), colors = textFieldColors)
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Contraseña") }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation(), colors = textFieldColors)
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = { Text("Confirmar Contraseña") }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation(), colors = textFieldColors)
+        OutlinedTextField(
+            value = name, 
+            onValueChange = { name = it }, 
+            label = { Text("Nombre Completo") }, 
+            modifier = Modifier.fillMaxWidth(), 
+            shape = RoundedCornerShape(16.dp),
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = UniversityGreen) },
+            colors = textFieldColors
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = email, 
+            onValueChange = { email = it }, 
+            label = { Text("Correo Institucional") }, 
+            modifier = Modifier.fillMaxWidth(), 
+            shape = RoundedCornerShape(16.dp),
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = UniversityGreen) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            colors = textFieldColors
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = password, 
+            onValueChange = { password = it }, 
+            label = { Text("Contraseña") }, 
+            modifier = Modifier.fillMaxWidth(), 
+            shape = RoundedCornerShape(16.dp),
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = UniversityGreen) },
+            visualTransformation = PasswordVisualTransformation(), 
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            colors = textFieldColors
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = confirmPassword, 
+            onValueChange = { confirmPassword = it }, 
+            label = { Text("Confirmar Contraseña") }, 
+            modifier = Modifier.fillMaxWidth(), 
+            shape = RoundedCornerShape(16.dp),
+            leadingIcon = { Icon(Icons.Default.LockReset, contentDescription = null, tint = UniversityGreen) },
+            visualTransformation = PasswordVisualTransformation(), 
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            colors = textFieldColors
+        )
         
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = { 
                 val cleanEmail = email.trim()
-                if (cleanEmail.isNotEmpty() && password.isNotEmpty()) {
-                    auth.createUserWithEmailAndPassword(cleanEmail, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Toast.makeText(context, "¡Cuenta creada!", Toast.LENGTH_SHORT).show()
-                                navController.navigate("login")
-                            } else {
-                                Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                            }
-                        }
+                if (name.isEmpty() || cleanEmail.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(context, "Por favor, completa todos los datos", Toast.LENGTH_SHORT).show()
+                    return@Button
                 }
+                if (password != confirmPassword) {
+                    Toast.makeText(context, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+                
+                auth.createUserWithEmailAndPassword(cleanEmail, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(context, "¡Cuenta creada con éxito!", Toast.LENGTH_SHORT).show()
+                            navController.navigate("login")
+                        } else {
+                            Toast.makeText(context, "Error al registrar: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
             },
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = UniversityGreen),
-            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && password == confirmPassword
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = UniversityGreen)
         ) {
-            Text("Crear cuenta", color = Color.White)
+            Text("Registrarme", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(16.dp))
         TextButton(onClick = { navController.navigate("login") }) {
