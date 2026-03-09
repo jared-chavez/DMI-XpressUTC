@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,6 +76,9 @@ fun MainApp() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
+    
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -143,24 +148,45 @@ fun MainApp() {
                     },
                     colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent, unselectedTextColor = Color.White, unselectedIconColor = Color.White)
                 )
+                
+                Spacer(modifier = Modifier.weight(1f))
+                NavigationDrawerItem(
+                    icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
+                    label = { Text("Cerrar Sesión") },
+                    selected = false,
+                    onClick = { 
+                        auth.signOut()
+                        navController.navigate("home") {
+                            popUpTo(0)
+                        }
+                        scope.launch { drawerState.close() } 
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent, unselectedTextColor = Color.White, unselectedIconColor = Color.White)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     ) {
         Scaffold(
-            bottomBar = { PremiumBottomNavigation(navController) }
+            bottomBar = { 
+                // Ocultar la barra blanca si estamos en el panel de administrador o estudiante
+                if (currentRoute != "admin" && currentRoute != "student") {
+                    PremiumBottomNavigation(navController)
+                }
+            }
         ) { innerPadding ->
             NavHost(
                 navController = navController, 
                 startDestination = "home",
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(if (currentRoute == "admin" || currentRoute == "student") PaddingValues(0.dp) else innerPadding)
             ) {
                 composable("home") { HomeScreen(navController, drawerState, scope) }
                 composable("catalog") { CatalogScreen() }
                 composable("snacks") { SnackScreen() }
                 composable("login") { LoginScreen(navController, auth) }
                 composable("register") { RegisterScreen(navController, auth) }
-                composable("student") { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Panel Estudiante", color = Color.Black) } }
-                composable("admin") { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Panel Admin", color = Color.Black) } }
+                composable("student") { StudentScreen(navController) }
+                composable("admin") { AdminScreen(navController) }
             }
         }
     }
