@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
@@ -17,12 +18,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.xpressutc.ui.theme.UniversityGreen
+import com.example.xpressutc.ui.theme.AccentGreen
+import com.example.xpressutc.ui.theme.DeepBlack
+import com.example.xpressutc.ui.theme.LightGray
+import com.example.xpressutc.ui.theme.White
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +52,7 @@ fun StudentScreen(navController: NavHostController) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black),
                 actions = {
-                    IconButton(onClick = { /* Lógica Notificaciones */ }) {
+                    IconButton(onClick = { /* Notificaciones */ }) {
                         Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.White)
                     }
                 }
@@ -58,9 +66,9 @@ fun StudentScreen(navController: NavHostController) {
                     icon = { Icon(Icons.Default.GridView, contentDescription = "Inicio") },
                     label = { Text("Inicio") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedIconColor = UniversityGreen,
                         unselectedIconColor = Color.Gray,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = UniversityGreen,
                         indicatorColor = Color.Transparent
                     )
                 )
@@ -70,9 +78,9 @@ fun StudentScreen(navController: NavHostController) {
                     icon = { Icon(Icons.Default.Restaurant, contentDescription = "Menú") },
                     label = { Text("Menú") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedIconColor = UniversityGreen,
                         unselectedIconColor = Color.Gray,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = UniversityGreen,
                         indicatorColor = Color.Transparent
                     )
                 )
@@ -82,9 +90,9 @@ fun StudentScreen(navController: NavHostController) {
                     icon = { Icon(Icons.AutoMirrored.Filled.Assignment, contentDescription = "Pedidos") },
                     label = { Text("Pedidos") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedIconColor = UniversityGreen,
                         unselectedIconColor = Color.Gray,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = UniversityGreen,
                         indicatorColor = Color.Transparent
                     )
                 )
@@ -94,9 +102,9 @@ fun StudentScreen(navController: NavHostController) {
                     icon = { Icon(Icons.Default.ManageAccounts, contentDescription = "Cuenta") },
                     label = { Text("Cuenta") },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedIconColor = UniversityGreen,
                         unselectedIconColor = Color.Gray,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = UniversityGreen,
                         indicatorColor = Color.Transparent
                     )
                 )
@@ -104,7 +112,7 @@ fun StudentScreen(navController: NavHostController) {
         },
         containerColor = Color.Black
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+        Box(modifier = Modifier.padding(padding).background(Color.Black)) {
             when (selectedTab) {
                 0 -> StudentHomeTab(navController)
                 1 -> StudentMenuTab()
@@ -137,12 +145,12 @@ fun StudentHomeTab(navController: NavHostController) {
                     Text(name, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
                 }
                 Surface(
-                    shape = RoundedCornerShape(50.dp),
-                    color = Color.DarkGray,
-                    modifier = Modifier.size(50.dp)
+                    shape = CircleShape,
+                    color = UniversityGreen.copy(alpha = 0.2f),
+                    modifier = Modifier.size(55.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(name.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(name.take(1).uppercase(), color = UniversityGreen, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                     }
                 }
             }
@@ -187,7 +195,7 @@ fun StudentHomeTab(navController: NavHostController) {
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Info, contentDescription = null, tint = UniversityGreen)
                     Spacer(modifier = Modifier.width(16.dp))
                     Text("Recuerda que el tiempo de entrega estimado es de 10-15 minutos.", color = Color.White, fontSize = 12.sp)
                 }
@@ -205,25 +213,35 @@ fun SectionHeader(title: String) {
 fun WalletCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Saldo en Monedero", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
-                Icon(Icons.Default.AccountBalanceWallet, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
-            }
-            Text("$250.00", color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { /* Recargar */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(12.dp)
-            ) {
-                Text("RECARGAR AHORA", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(UniversityGreen, AccentGreen)
+                    )
+                )
+                .padding(24.dp)
+        ) {
+            Column {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text("Saldo en Monedero", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Icon(Icons.Default.AccountBalanceWallet, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                }
+                Text("$750.00", color = Color.White, fontSize = 42.sp, fontWeight = FontWeight.ExtraBold)
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(
+                    onClick = { /* Recargar */ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(12.dp)
+                ) {
+                    Text("RECARGAR SALDO", color = Color.Black, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                }
             }
         }
     }
@@ -234,7 +252,7 @@ fun PromotionCard(title: String, subtitle: String, color: Color) {
     Card(
         modifier = Modifier.width(220.dp).height(110.dp),
         colors = CardDefaults.cardColors(containerColor = color),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             Column(modifier = Modifier.align(Alignment.CenterStart)) {
@@ -266,24 +284,24 @@ fun StudentMenuTab() {
 fun StudentCatalogItemCard(name: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp).background(Color.DarkGray))
+            Box(modifier = Modifier.fillMaxWidth().height(110.dp).background(Color.DarkGray))
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(name, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color.White)
-                Text("$55.00", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(8.dp))
+                Text("$55.00", color = UniversityGreen, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = { /* Agregar */ },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(0.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = UniversityGreen)
                 ) {
-                    Text("Agregar", fontSize = 12.sp, color = Color.White)
+                    Text("Añadir", fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -295,7 +313,7 @@ fun QuickActionCard(title: String, icon: ImageVector, modifier: Modifier = Modif
     Card(
         modifier = modifier.height(100.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         onClick = onClick
     ) {
         Column(
@@ -303,7 +321,7 @@ fun QuickActionCard(title: String, icon: ImageVector, modifier: Modifier = Modif
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+            Icon(icon, contentDescription = null, tint = UniversityGreen, modifier = Modifier.size(32.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text(title, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium)
         }
@@ -324,15 +342,15 @@ fun ProfileTab(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.size(100.dp).background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(50.dp)),
+            modifier = Modifier.size(100.dp).background(UniversityGreen, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(name.take(1).uppercase(), color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold)
         }
         
         Spacer(modifier = Modifier.height(24.dp))
-        Text("Modificar Datos", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("Mantén tu información al día", color = Color.Gray, fontSize = 14.sp)
+        Text("Mi Cuenta", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text("Gestiona tu información personal", color = Color.Gray, fontSize = 14.sp)
         Spacer(modifier = Modifier.height(32.dp))
 
         ProfileTextField(value = name, onValueChange = { name = it }, label = "Nombre Completo", icon = Icons.Default.Person)
@@ -344,12 +362,12 @@ fun ProfileTab(navController: NavHostController) {
         Spacer(modifier = Modifier.height(32.dp))
         
         Button(
-            onClick = { /* Lógica para actualizar perfil */ },
+            onClick = { /* Actualizar */ },
             modifier = Modifier.fillMaxWidth().height(55.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            colors = ButtonDefaults.buttonColors(containerColor = UniversityGreen),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("GUARDAR CAMBIOS", fontWeight = FontWeight.Bold)
+            Text("GUARDAR CAMBIOS", fontWeight = FontWeight.ExtraBold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -374,21 +392,21 @@ fun ProfileTextField(value: String, onValueChange: (String) -> Unit, label: Stri
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, color = Color.Gray) },
-        leadingIcon = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = UniversityGreen) },
         modifier = Modifier.fillMaxWidth(),
         visualTransformation = if (isPassword) androidx.compose.ui.text.input.PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = Color.White,
             unfocusedTextColor = Color.White,
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = UniversityGreen,
             unfocusedBorderColor = Color.DarkGray,
-            cursorColor = MaterialTheme.colorScheme.primary
+            cursorColor = UniversityGreen,
+            focusedContainerColor = Color(0xFF111111),
+            unfocusedContainerColor = Color(0xFF111111)
         ),
         shape = RoundedCornerShape(12.dp)
     )
 }
-
-data class Order(val id: String, val fecha: String, val total: Double, val estado: String)
 
 @Composable
 fun OrdersTab() {
@@ -415,7 +433,7 @@ fun OrderCard(order: Order) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -425,17 +443,17 @@ fun OrderCard(order: Order) {
             Column {
                 Text(order.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Text(order.fecha, color = Color.Gray, fontSize = 12.sp)
-                Text("$${order.total}", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text("$${order.total}", color = UniversityGreen, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
             
             Surface(
-                color = if (order.estado == "En preparación") MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.1f),
+                color = if (order.estado == "En preparación") UniversityGreen.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = order.estado,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    color = if (order.estado == "En preparación") MaterialTheme.colorScheme.primary else Color.Gray,
+                    color = if (order.estado == "En preparación") UniversityGreen else Color.Gray,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -443,3 +461,5 @@ fun OrderCard(order: Order) {
         }
     }
 }
+
+data class Order(val id: String, val fecha: String, val total: Double, val estado: String)

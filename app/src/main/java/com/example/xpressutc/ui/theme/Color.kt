@@ -2,13 +2,12 @@ package com.example.xpressutc.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Paleta oficial XpressUTC (Ejemplo: Verdes y Blancos universitarios)
-val UTCGreen = Color(0xFF1B5E20)
-val UTCGreenLight = Color(0xFF4C8C4A)
-val UTCGreenDark = Color(0xFF003300)
-val UTCAccent = Color(0xFFFFC107) // Amarillo/Dorado para resaltar
-
+val UniversityGreen = Color(0xFF2E7D32) // Verde institucional vibrante
+val UniversityGreenLight = Color(0xFF60AD5E)
+val DeepBlack = Color(0xFF0A0A0A)
+val CardBlack = Color(0xFF121212)
+val LightGray = Color(0xFFF4F4F4)
+val MediumGray = Color(0xFF8E8E93)
 val White = Color(0xFFFFFFFF)
-val BackgroundGray = Color(0xFFF5F5F5)
-val TextGray = Color(0xFF757575)
-val ErrorRed = Color(0xFFB00020)
+val UTCGreen = Color(0xFF1B5E20)
+val AccentGreen = Color(0xFF43A047) // Verde para acentos y botones
